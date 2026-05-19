@@ -23,7 +23,8 @@ const handleLogout = () => {
       <div class="container-fluid justify-content-center">
         <div class="nav-card shadow-sm d-flex align-items-center">
           <router-link class="navbar-brand me-4 d-none d-lg-block" to="/">
-            <span class="text-primary fw-bold">Student App</span>
+            <img src="@/assets/logo.jpg" alt="Logo" class="navbar-logo" />
+            <span class="text-primary fw-bold ms-2">Student App</span>
           </router-link>
 
           <div class="navbar-nav flex-row gap-2 gap-md-4">
@@ -59,6 +60,13 @@ const handleLogout = () => {
 </template>
 
 <style scoped>
+.navbar-logo {
+  height: 40px;
+  width: auto;
+  border-radius: 8px;
+  object-fit: contain;
+}
+
 .navbar-wrapper {
   background: linear-gradient(90deg, #0d6efd 0%, #003399 100%);
   padding: 30px 0;
