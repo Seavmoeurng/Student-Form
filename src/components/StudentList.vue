@@ -1,13 +1,13 @@
 <template>
-  <div class="card glass-card shadow-lg border-0">
-    <div class="card-body">
+  <div class="card cyber-card shadow-lg border-0">
+    <div class="card-body p-4">
       <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
-        <h2 class="text-white fw-bold mb-0">Student Management</h2>
+        <h2 class="text-white fw-extrabold mb-0 list-title">STUDENT REGISTRY AUDIT</h2>
         <div class="d-flex align-items-center gap-3 flex-wrap">
           <!-- Page Size Selector -->
           <div class="d-flex align-items-center gap-2">
-            <span class="text-white opacity-75 small text-nowrap"><i class="bi bi-list-ol"></i> Show:</span>
-            <select v-model="itemsPerPage" @change="currentPage = 1" class="form-select form-select-sm" style="width: 80px; border-radius: 8px;">
+            <span class="text-white-50 small text-nowrap"><i class="bi bi-list-ol text-neon-pink"></i> Show:</span>
+            <select v-model="itemsPerPage" @change="currentPage = 1" class="form-select select-cyber-sm">
               <option :value="20" class="dropdown-option">20</option>
               <option :value="40" class="dropdown-option">40</option>
               <option :value="100" class="dropdown-option">100</option>
@@ -16,8 +16,8 @@
 
           <!-- Sort Option Dropdown -->
           <div class="d-flex align-items-center gap-2">
-            <span class="text-white opacity-75 small text-nowrap"><i class="bi bi-sort-down"></i> Sort:</span>
-            <select v-model="sortBy" class="form-select form-select-sm" style="width: 140px; border-radius: 8px;">
+            <span class="text-white-50 small text-nowrap"><i class="bi bi-sort-down text-neon-pink"></i> Sort:</span>
+            <select v-model="sortBy" class="form-select select-cyber-sm">
               <option value="newest" class="dropdown-option">Newest Added</option>
               <option value="oldest" class="dropdown-option">Oldest Added</option>
               <option value="name-asc" class="dropdown-option">Name (A-Z)</option>
@@ -28,36 +28,35 @@
           <button
             @click="fetchStudents"
             :disabled="loading"
-            class="btn btn-light btn-sm px-3 text-dark fw-bold border-0 shadow-sm"
-            style="border-radius: 8px;"
+            class="btn refresh-list-btn btn-sm px-3 text-white fw-bold"
           >
             <span
               v-if="loading"
-              class="spinner-border spinner-border-sm me-1"
+              class="spinner-border spinner-border-sm me-1 text-white"
             ></span>
-            {{ loading ? "Updating..." : "Refresh List" }}
+            {{ loading ? "AUDITING..." : "REFRESH LOGS" }}
           </button>
         </div>
       </div>
 
       <div class="table-responsive">
-        <table class="table table-hover align-middle border">
-          <thead class="table-primary">
-            <tr>
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr class="border-purple-20">
               <th style="width: 80px">ID</th>
               <th>Profile</th>
               <th>Full Name</th>
               <th>Email Address</th>
               <th>Status</th>
-              <th class="text-center">Action</th>
+              <th class="text-center">Action Console</th>
             </tr>
           </thead>
           <tbody>
             <!-- Loading State -->
             <tr v-if="loading">
               <td colspan="6" class="text-center py-5">
-                <div class="spinner-border text-primary" role="status"></div>
-                <p class="mt-2 text-muted">Loading student data...</p>
+                <div class="spinner-border text-neon-pink" role="status"></div>
+                <p class="mt-2 text-white-50">Auditing blockchain nodes...</p>
               </td>
             </tr>
 
@@ -65,45 +64,42 @@
             <tr
               v-for="(student, index) in paginatedStudents"
               :key="student._id || index"
+              class="border-purple-10"
             >
-              <td class="fw-bold text-muted">{{ (currentPage - 1) * itemsPerPage + index + 1 }}</td>
+              <td class="fw-bold text-white-50 font-monospace">{{ (currentPage - 1) * itemsPerPage + index + 1 }}</td>
               <td>
                 <img
                   :src="getProfileImage(index)"
                   alt="Profile"
-                  class="rounded-circle shadow-sm border"
-                  style="width: 45px; height: 45px; object-fit: cover"
+                  class="rounded-circle shadow-sm profile-image-cyber"
                 />
               </td>
-              <td class="fw-semibold">
+              <td class="fw-bold text-white">
                 {{ student.firstName }} {{ student.lastName }}
               </td>
-              <td>{{ student.email }}</td>
+              <td class="text-white-50 font-monospace">{{ student.email }}</td>
               <td>
                 <span
-                  :class="
-                    student.active !== false
-                      ? 'badge bg-success'
-                      : 'badge bg-danger'
-                  "
+                  class="badge badge-cyber"
+                  :style="student.active !== false ? 'background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.3);' : 'background: rgba(244, 63, 94, 0.15); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.3);'"
                 >
-                  {{ student.active !== false ? "Active" : "Inactive" }}
+                  {{ student.active !== false ? "ACTIVE" : "INACTIVE" }}
                 </span>
               </td>
               <td class="text-center">
                 <div class="d-flex justify-content-center gap-2">
                   <button
                     @click="editStudent(student)"
-                    class="btn btn-sm btn-info text-white px-3 shadow-sm"
+                    class="btn btn-sm btn-cyber-edit px-3"
                   >
-                    <i class="bi bi-pencil-square"></i> Edit
+                    <i class="bi bi-pencil-square"></i> EDIT
                   </button>
 
                   <button
                     @click="deleteStudent(student._id)"
-                    class="btn btn-sm btn-danger px-3 shadow-sm"
+                    class="btn btn-sm btn-cyber-delete px-3"
                   >
-                    <i class="bi bi-trash"></i> Delete
+                    <i class="bi bi-trash"></i> DELETE
                   </button>
                 </div>
               </td>
@@ -111,9 +107,9 @@
 
             <!-- Empty State -->
             <tr v-if="!loading && students.length === 0">
-              <td colspan="6" class="text-center py-5 text-muted">
-                <i class="bi bi-people fs-1"></i>
-                <p>No students found in the database.</p>
+              <td colspan="6" class="text-center py-5 text-white-50">
+                <i class="bi bi-people fs-1 text-neon-pink mb-2"></i>
+                <p>No student registry nodes found in the database.</p>
               </td>
             </tr>
           </tbody>
@@ -121,13 +117,13 @@
       </div>
 
       <!-- Pagination Controls -->
-      <div v-if="sortedStudents.length > 0" class="d-flex flex-wrap justify-content-between align-items-center mt-4 pt-3 border-top gap-3">
+      <div v-if="sortedStudents.length > 0" class="d-flex flex-wrap justify-content-between align-items-center mt-4 pt-3 border-top border-purple-20 gap-3">
         <!-- Pagination Page Tabs and Arrows -->
         <nav v-if="totalPages > 1" aria-label="Page navigation">
-          <ul class="pagination pagination-sm mb-0 align-items-center">
+          <ul class="pagination pagination-sm mb-0 align-items-center gap-1">
             <!-- Previous Arrow -->
             <li class="page-item" :class="{ disabled: currentPage === 1 }">
-              <button class="page-link shadow-none" @click="currentPage--" aria-label="Previous" style="border-radius: 8px 0 0 8px;">
+              <button class="page-link shadow-none" @click="currentPage--" aria-label="Previous">
                 <span aria-hidden="true">&laquo;</span>
               </button>
             </li>
@@ -139,7 +135,7 @@
 
             <!-- Next Arrow -->
             <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-              <button class="page-link shadow-none" @click="currentPage++" aria-label="Next" style="border-radius: 0 8px 8px 0;">
+              <button class="page-link shadow-none" @click="currentPage++" aria-label="Next">
                 <span aria-hidden="true">&raquo;</span>
               </button>
             </li>
@@ -147,8 +143,8 @@
         </nav>
         
         <!-- Info text -->
-        <div class="text-white opacity-75 small text-end flex-grow-1">
-          Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to {{ Math.min(currentPage * itemsPerPage, sortedStudents.length) }} of {{ sortedStudents.length }} students
+        <div class="text-white-50 small text-end flex-grow-1 font-monospace">
+          Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to {{ Math.min(currentPage * itemsPerPage, sortedStudents.length) }} of {{ sortedStudents.length }} system logs
         </div>
       </div>
     </div>
@@ -301,79 +297,170 @@ defineExpose({
 </script>
 
 <style scoped>
-.table-hover tbody tr:hover {
-  background-color: rgba(255, 255, 255, 0.08) !important;
-  transition: all 0.2s ease;
+.cyber-card {
+  background: #121124;
+  border: 1.5px solid rgba(168, 85, 247, 0.2);
+  border-radius: 24px;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.2);
 }
 
-.badge {
-  font-weight: 500;
-  padding: 0.5em 0.75em;
-}
-
-.glass-card {
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 20px;
-}
-
-thead th {
-  font-weight: 600;
-  text-transform: uppercase;
-  font-size: 0.85rem;
+.list-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 800;
   letter-spacing: 0.5px;
-  color: rgba(255, 255, 255, 0.9) !important;
-  background-color: rgba(255, 255, 255, 0.06);
+  background: linear-gradient(90deg, #ffffff 0%, #d946ef 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-/* Custom Dropdown select styling inside glass card */
-.form-select-sm {
-  background-color: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.2);
-  color: white;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+.text-neon-pink {
+  color: #f43f5e;
+  text-shadow: 0 0 8px rgba(244, 63, 94, 0.4);
 }
 
-.form-select-sm:focus {
-  background-color: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.4);
+.border-purple-20 {
+  border-color: rgba(168, 85, 247, 0.25) !important;
+}
+
+.border-purple-10 {
+  border-color: rgba(168, 85, 247, 0.1) !important;
+}
+
+.profile-image-cyber {
+  width: 42px;
+  height: 42px;
+  object-fit: cover;
+  border: 2px solid rgba(168, 85, 247, 0.4);
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.25);
+}
+
+.badge-cyber {
+  font-weight: 700;
+  font-family: 'Space Grotesk', sans-serif;
+  letter-spacing: 0.5px;
+  padding: 0.45em 0.75em;
+  font-size: 0.7rem;
+  border-radius: 6px;
+}
+
+/* Custom dropdown select styling */
+.select-cyber-sm {
+  width: auto;
+  min-width: 90px;
+  background-color: rgba(7, 5, 14, 0.6);
+  border: 1px solid rgba(168, 85, 247, 0.35);
   color: white;
-  box-shadow: none;
+  border-radius: 8px;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23d946ef' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+  font-size: 0.85rem;
+  transition: all 0.3s;
+}
+
+.select-cyber-sm:focus {
+  background-color: rgba(7, 5, 14, 0.8);
+  border-color: #d946ef;
+  color: white;
+  box-shadow: 0 0 10px rgba(217, 70, 239, 0.25);
 }
 
 .dropdown-option {
-  background-color: #0b1a3a;
+  background-color: #121124;
   color: #ffffff;
 }
 
-/* Pagination button style override */
+.refresh-list-btn {
+  background: rgba(168, 85, 247, 0.1);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  transition: all 0.3s;
+}
+
+.refresh-list-btn:hover {
+  background: rgba(168, 85, 247, 0.2);
+  border-color: #d946ef;
+}
+
+/* Table styling */
+.table {
+  --bs-table-bg: transparent;
+  --bs-table-color: #ffffff;
+  --bs-table-hover-color: #ffffff;
+  --bs-table-hover-bg: rgba(168, 85, 247, 0.08);
+  --bs-table-border-color: rgba(168, 85, 247, 0.15);
+}
+
+thead th {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+  color: rgba(255, 255, 255, 0.9) !important;
+  background-color: rgba(168, 85, 247, 0.05);
+}
+
+/* Action button consoles */
+.btn-cyber-edit {
+  background: rgba(0, 229, 255, 0.1);
+  border: 1px solid rgba(0, 229, 255, 0.35);
+  color: #00e5ff;
+  font-weight: 700;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.75rem;
+  transition: all 0.3s;
+}
+
+.btn-cyber-edit:hover {
+  background: rgba(0, 229, 255, 0.2);
+  border-color: #00e5ff;
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.3) !important;
+  color: #ffffff;
+}
+
+.btn-cyber-delete {
+  background: rgba(244, 63, 94, 0.1);
+  border: 1px solid rgba(244, 63, 94, 0.35);
+  color: #f43f5e;
+  font-weight: 700;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.75rem;
+  transition: all 0.3s;
+}
+
+.btn-cyber-delete:hover {
+  background: rgba(244, 63, 94, 0.2);
+  border-color: #f43f5e;
+  box-shadow: 0 0 10px rgba(244, 63, 94, 0.3) !important;
+  color: #ffffff;
+}
+
+/* Pagination custom deep purple design */
 .pagination :deep(.page-link) {
-  background-color: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.15);
+  background-color: rgba(7, 5, 14, 0.6);
+  border-color: rgba(168, 85, 247, 0.25);
+  color: #9da2c0;
+  border-radius: 6px;
+  padding: 6px 12px;
+}
+
+.pagination :deep(.page-link:hover) {
+  background-color: rgba(168, 85, 247, 0.1);
   color: #ffffff;
 }
 
 .pagination :deep(.page-item.active .page-link) {
-  background-color: #ffffff;
-  border-color: #ffffff;
-  color: #511874; /* deep purple text for active state */
+  background: linear-gradient(135deg, #a855f7 0%, #d946ef 100%);
+  border: none;
+  color: #ffffff;
   font-weight: bold;
+  box-shadow: 0 0 10px rgba(217, 70, 239, 0.3);
 }
 
 .pagination :deep(.page-item.disabled .page-link) {
-  background-color: rgba(255, 255, 255, 0.03);
-  border-color: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.35);
-}
-
-.table {
-  color: #ffffff !important;
-  border-color: rgba(255, 255, 255, 0.15) !important;
-}
-
-.table > :not(caption) > * > * {
-  border-bottom-color: rgba(255, 255, 255, 0.15);
+  background-color: rgba(7, 5, 14, 0.3);
+  border-color: rgba(168, 85, 247, 0.1);
+  color: rgba(255, 255, 255, 0.15);
 }
 </style>
