@@ -21,8 +21,6 @@ const student = ref({
 const toast = useToast();
 
 const addStudent = async () => {
-
-
   if (student.value.password !== student.value.confirmPassword) {
     toast.error('Passwords do not match');
     return;
@@ -56,7 +54,7 @@ const addStudent = async () => {
     const response = await axios.post(url, payload);
     
     if (response.status === 201 || response.status === 200) {
-      toast.success('Student added successfully');
+      toast.success('Student registered successfully');
       
       // Emit event so parent component can react
       emit('student-added');
@@ -85,119 +83,233 @@ const addStudent = async () => {
 </script>
 
 <template>
-  <div class="student-form-card shadow-sm border-0 bg-white p-4 rounded-4">
-    <h3 class="mb-4 text-primary fw-bold">Register Student</h3>
+  <div class="student-register-container">
+    <h2 class="mb-4 text-white fw-bold text-start fs-3">Create Your Account</h2>
 
-    <form @submit.prevent="addStudent" class="student-form">
-      <div class="mb-3">
-        <label class="form-label fw-semibold">Email address</label>
-        <input type="email" v-model="student.email" required class="form-control" placeholder="example@email.com" />
+    <form @submit.prevent="addStudent" class="student-form scrollable-form-fields">
+      
+      <!-- Email address (White Underline) -->
+      <div class="input-line-group mb-4">
+        <input 
+          type="email" 
+          v-model="student.email" 
+          required 
+          class="input-line-white" 
+          placeholder="Email address" 
+        />
       </div>
 
-      <div class="row">
-        <div class="col-md-6 mb-3">
-          <label class="form-label fw-semibold">Password</label>
-          <input type="password" v-model="student.password" required class="form-control" placeholder="••••••••" />
+      <!-- First Name / Last Name (Side by Side) -->
+      <div class="row g-3">
+        <div class="col-6 mb-4">
+          <div class="input-line-group">
+            <input 
+              type="text" 
+              v-model="student.firstName" 
+              required 
+              class="input-line-white" 
+              placeholder="First Name" 
+            />
+          </div>
         </div>
-        <div class="col-md-6 mb-3">
-          <label class="form-label fw-semibold">Confirm Password</label>
-          <input type="password" v-model="student.confirmPassword" required class="form-control" placeholder="••••••••" />
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-md-6 mb-3">
-          <label class="form-label fw-semibold">First Name</label>
-          <input type="text" v-model="student.firstName" required class="form-control" placeholder="First Name" />
-        </div>
-        <div class="col-md-6 mb-3">
-          <label class="form-label fw-semibold">Last Name</label>
-          <input type="text" v-model="student.lastName" required class="form-control" placeholder="Last Name" />
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-md-6 mb-3">
-          <label class="form-label fw-semibold">Gender</label>
-          <select v-model="student.gender" class="form-select" required>
-            <option value="">Select Gender</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-          </select>
-        </div>
-        <div class="col-md-6 mb-3">
-          <label class="form-label fw-semibold">Status</label>
-          <select v-model="student.studentStatus" class="form-select" required>
-            <option value="">Select Status</option>
-            <option value="Single">Single</option>
-            <option value="Married">Married</option>
-          </select>
+        <div class="col-6 mb-4">
+          <div class="input-line-group">
+            <input 
+              type="text" 
+              v-model="student.lastName" 
+              required 
+              class="input-line-white" 
+              placeholder="Last Name" 
+            />
+          </div>
         </div>
       </div>
 
-      <div class="row">
-        <div class="col-md-6 mb-3">
-          <label class="form-label fw-semibold">Active</label>
-          <select v-model="student.active" class="form-select" required>
-            <option value="true">True (Active)</option>
-            <option value="false">False (Inactive)</option>
-          </select>
+      <!-- Password / Confirm Password (Side by side) -->
+      <div class="row g-3">
+        <div class="col-6 mb-4">
+          <div class="input-line-group">
+            <input 
+              type="password" 
+              v-model="student.password" 
+              required 
+              class="input-line-white" 
+              placeholder="Password" 
+            />
+          </div>
         </div>
-        <div class="col-md-6 mb-3">
-          <label class="form-label fw-semibold">Score (0-100)</label>
-          <input type="number" v-model="student.score" required class="form-control" min="0" max="100" placeholder="Score" />
+        <div class="col-6 mb-4">
+          <div class="input-line-group">
+            <input 
+              type="password" 
+              v-model="student.confirmPassword" 
+              required 
+              class="input-line-white" 
+              placeholder="Confirm Password" 
+            />
+          </div>
         </div>
       </div>
 
-      <div class="mb-3">
-        <label class="form-label fw-semibold">Date of Birth</label>
-        <input type="date" v-model="student.DateOfBirth" required class="form-control" />
+      <!-- Gender / Status (Side by Side select) -->
+      <div class="row g-3">
+        <div class="col-6 mb-4">
+          <div class="input-line-group">
+            <select v-model="student.gender" class="select-line-white" required>
+              <option value="" disabled selected>Gender</option>
+              <option value="Male" class="dropdown-option">Male</option>
+              <option value="Female" class="dropdown-option">Female</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-6 mb-4">
+          <div class="input-line-group">
+            <select v-model="student.studentStatus" class="select-line-white" required>
+              <option value="" disabled selected>Status</option>
+              <option value="Single" class="dropdown-option">Single</option>
+              <option value="Married" class="dropdown-option">Married</option>
+            </select>
+          </div>
+        </div>
       </div>
 
-      <button type="submit" class="btn btn-primary w-100 py-2.5 fw-semibold mt-3 shadow-sm">
-        Add Student
+      <!-- Active / Score (Side by Side) -->
+      <div class="row g-3">
+        <div class="col-6 mb-4">
+          <div class="input-line-group">
+            <select v-model="student.active" class="select-line-white" required>
+              <option value="true" class="dropdown-option">True (Active)</option>
+              <option value="false" class="dropdown-option">False (Inactive)</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-6 mb-4">
+          <div class="input-line-group">
+            <input 
+              type="number" 
+              v-model="student.score" 
+              required 
+              class="input-line-white" 
+              min="0" 
+              max="100" 
+              placeholder="Score (0-100)" 
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Date of Birth -->
+      <div class="input-line-group mb-5">
+        <label class="date-label small opacity-75 text-white mb-1 d-block">Date of Birth</label>
+        <input 
+          type="date" 
+          v-model="student.DateOfBirth" 
+          required 
+          class="input-line-white date-input-white" 
+        />
+      </div>
+
+      <!-- Pill Shaped Sign Up Button -->
+      <button type="submit" class="btn sign-up-pill-btn w-100 py-2.5 shadow-sm">
+        Sign up
       </button>
+
     </form>
   </div>
 </template>
 
 <style scoped>
-.student-form-card {
-  border-radius: 15px;
-  background-color: #fff;
-  transition: all 0.3s ease;
+.student-register-container {
+  width: 100%;
 }
 
-.student-form-card:hover {
-  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.08) !important;
+.scrollable-form-fields {
+  max-height: 480px;
+  overflow-y: auto;
+  padding-right: 8px;
 }
 
-.form-label {
-  font-size: 0.9rem;
-  color: #495057;
+/* Custom Scrollbar for better UI inside the mobile-frame card */
+.scrollable-form-fields::-webkit-scrollbar {
+  width: 4px;
+}
+.scrollable-form-fields::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+.scrollable-form-fields::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
 }
 
-.form-control, .form-select {
-  border-radius: 8px;
-  padding: 0.6rem 0.75rem;
-  border: 1px solid #ced4da;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+/* Line Inputs styled to match Mockup Screen 3 */
+.input-line-group {
+  position: relative;
+  width: 100%;
 }
 
-.form-control:focus, .form-select:focus {
-  border-color: #86b7fe;
-  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
-}
-
-.btn-primary {
-  border-radius: 8px;
-  background: linear-gradient(90deg, #0d6efd 0%, #0056b3 100%);
+.input-line-white {
+  width: 100%;
   border: none;
-  transition: all 0.3s ease;
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.4);
+  background: transparent;
+  padding: 8px 0;
+  color: #ffffff;
+  font-size: 0.95rem;
+  transition: all 0.3s;
+  outline: none;
 }
 
-.btn-primary:hover {
+.input-line-white::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.input-line-white:focus {
+  border-bottom-color: #00d2ff;
+}
+
+/* Custom Select styling to stay flat and white */
+.select-line-white {
+  width: 100%;
+  border: none;
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.4);
+  background: transparent;
+  padding: 8px 0;
+  color: #ffffff;
+  font-size: 0.95rem;
+  transition: all 0.3s;
+  outline: none;
+}
+
+.select-line-white:focus {
+  border-bottom-color: #00d2ff;
+}
+
+.dropdown-option {
+  background-color: #002266; /* Dark background so options are readable */
+  color: #ffffff;
+}
+
+/* Date picker customization */
+.date-input-white {
+  color-scheme: dark; /* Makes the native date browser popup dark themed and text white */
+}
+
+/* Sign up Pill-shaped Button in Mockup */
+.sign-up-pill-btn {
+  background: linear-gradient(90deg, #00d2ff 0%, #0072ff 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 30px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 210, 255, 0.3) !important;
+}
+
+.sign-up-pill-btn:hover {
+  box-shadow: 0 6px 18px rgba(0, 210, 255, 0.45) !important;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3) !important;
+  color: #ffffff;
 }
 </style>
