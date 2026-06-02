@@ -23,7 +23,7 @@ const handleLogin = async () => {
         if (response.data && response.data.token) {
             localStorage.setItem('token', response.data.token);
             toast.success('Login successful!');
-            router.push('/students');
+            router.push('/');
         } else {
             toast.error('Invalid response from server');
         }

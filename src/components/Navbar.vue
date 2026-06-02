@@ -20,38 +20,43 @@ const handleLogout = () => {
 <template>
   <div class="navbar-wrapper">
     <nav class="navbar navbar-expand-lg navbar-light floating-navbar">
-      <div class="container-fluid justify-content-center">
-        <div class="nav-card shadow-sm d-flex align-items-center">
-          <router-link class="navbar-brand me-4 d-none d-lg-block" to="/">
+      <div class="container-fluid">
+        <div class="nav-card shadow-sm d-flex justify-content-between align-items-center w-100">
+          <router-link class="navbar-brand d-flex align-items-center" to="/">
             <img src="@/assets/logo.jpg" alt="Logo" class="navbar-logo" />
             <span class="text-primary fw-bold ms-2">Student App</span>
           </router-link>
 
           <div class="navbar-nav flex-row gap-2 gap-md-4">
-            <router-link class="nav-link custom-link d-flex align-items-center gap-2" active-class="active" to="/">
-              <i class="bi bi-house-door"></i>
-              <span>Home</span>
-            </router-link>
-            
-            <router-link class="nav-link custom-link d-flex align-items-center gap-2" active-class="active" to="/add-student">
-              <i class="bi bi-plus-square"></i>
-              <span>Add Student</span>
-            </router-link>
-            
-            <router-link class="nav-link custom-link d-flex align-items-center gap-2" active-class="active" to="/students">
-              <i class="bi bi-people"></i>
-              <span>Student List</span>
-            </router-link>
+            <!-- Unauthenticated Links -->
+            <template v-if="!isAuthenticated">
+              <router-link class="nav-link custom-link d-flex align-items-center gap-2" active-class="active" to="/add-student">
+                <i class="bi bi-person-plus"></i>
+                <span>Register</span>
+              </router-link>
+              <router-link class="nav-link custom-link d-flex align-items-center gap-2" active-class="active" to="/login">
+                <i class="bi bi-box-arrow-in-right"></i>
+                <span>Login</span>
+              </router-link>
+            </template>
 
-            <router-link v-if="!isAuthenticated" class="nav-link custom-link d-flex align-items-center gap-2" active-class="active" to="/login">
-              <i class="bi bi-person"></i>
-              <span>Login</span>
-            </router-link>
-            
-            <a v-else @click.prevent="handleLogout" href="#" class="nav-link custom-link d-flex align-items-center gap-2">
-              <i class="bi bi-box-arrow-right"></i>
-              <span>Logout</span>
-            </a>
+            <!-- Authenticated Links -->
+            <template v-else>
+              <router-link class="nav-link custom-link d-flex align-items-center gap-2" active-class="active" to="/">
+                <i class="bi bi-house-door"></i>
+                <span>Home</span>
+              </router-link>
+              
+              <router-link class="nav-link custom-link d-flex align-items-center gap-2" active-class="active" to="/students">
+                <i class="bi bi-people"></i>
+                <span>Student List</span>
+              </router-link>
+              
+              <a @click.prevent="handleLogout" href="#" class="nav-link custom-link d-flex align-items-center gap-2">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>Logout</span>
+              </a>
+            </template>
           </div>
         </div>
       </div>
@@ -82,6 +87,8 @@ const handleLogout = () => {
   padding: 10px 30px;
   border-radius: 12px;
   min-height: 60px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid rgba(0, 0, 0, 0.02);
 }
 
 .custom-link {
