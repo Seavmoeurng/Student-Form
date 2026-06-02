@@ -4,16 +4,48 @@ import { useRouter } from 'vue-router';
 
 const router = useRouter();
 const isAuthenticated = ref(!!localStorage.getItem('token'));
+const userName = ref('System Admin');
+const userAvatar = ref('https://t3.ftcdn.net/jpg/16/06/80/78/360_F_1606807867_RlJNJoHBniGLT1a88UuAIfkEnALRwUoW.jpg');
 
-// Watch for route changes to update authentication state
+const updateProfileFromStorage = () => {
+  const name = localStorage.getItem('google_user_name');
+  const picture = localStorage.getItem('google_user_picture');
+  const email = localStorage.getItem('google_user_email');
+  
+  if (name) {
+    userName.value = name;
+  } else if (email) {
+    userName.value = email.split('@')[0];
+  } else {
+    userName.value = 'System Admin';
+  }
+  
+  if (picture) {
+    userAvatar.value = picture;
+  } else {
+    userAvatar.value = 'https://t3.ftcdn.net/jpg/16/06/80/78/360_F_1606807867_RlJNJoHBniGLT1a88UuAIfkEnALRwUoW.jpg';
+  }
+};
+
+onMounted(() => {
+  updateProfileFromStorage();
+});
+
+// Watch for route changes to update authentication state and user profile
 watch(() => router.currentRoute.value, () => {
     isAuthenticated.value = !!localStorage.getItem('token');
+    updateProfileFromStorage();
 });
 
 const handleLogout = () => {
-    localStorage.removeItem('token');
-    isAuthenticated.value = false;
-    router.push('/login');
+    if (confirm('Are you sure you want to log out of the system?')) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('google_user_email');
+        localStorage.removeItem('google_user_name');
+        localStorage.removeItem('google_user_picture');
+        isAuthenticated.value = false;
+        router.push('/login');
+    }
 };
 </script>
 
@@ -59,13 +91,22 @@ const handleLogout = () => {
                 <i class="bi bi-people"></i>
                 <span>Student List</span>
               </router-link>
+
+              <router-link class="nav-link custom-link d-flex align-items-center gap-2" active-class="active" to="/profile">
+                <i class="bi bi-person-circle"></i>
+                <span>Profile</span>
+              </router-link>
               
               <a @click.prevent="handleLogout" href="#" class="nav-link custom-link d-flex align-items-center gap-2">
                 <i class="bi bi-box-arrow-right"></i>
                 <span>Logout</span>
               </a>
 
-              <span class="nav-user-badge ms-2 d-none d-sm-inline-block">System Admin</span>
+              <!-- Avatar & Name Display -->
+              <div class="nav-profile-badge d-flex align-items-center gap-2 ms-2">
+                <img :src="userAvatar" class="nav-avatar-img" alt="User Avatar" />
+                <span class="nav-user-name d-none d-sm-inline-block">{{ userName }}</span>
+              </div>
             </template>
           </div>
         </div>
@@ -186,6 +227,30 @@ const handleLogout = () => {
   font-size: 0.8rem;
   font-weight: 600;
   text-shadow: 0 0 8px rgba(217, 70, 239, 0.4);
+  letter-spacing: 0.5px;
+}
+
+.nav-profile-badge {
+  background: rgba(168, 85, 247, 0.1);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  padding: 4px 12px;
+  border-radius: 20px;
+  max-height: 36px;
+}
+
+.nav-avatar-img {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #d946ef;
+}
+
+.nav-user-name {
+  font-family: 'Space Grotesk', sans-serif;
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 600;
   letter-spacing: 0.5px;
 }
 

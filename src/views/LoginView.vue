@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
@@ -73,6 +73,8 @@ const simulateGoogleLogin = () => {
   }, 800);
 };
 
+const defaultClientId = '364372938834-tq0r7c0jtrc4csqe88chpvd5q1cgr64m.apps.googleusercontent.com';
+
 const loginWithGoogle = () => {
   if (!googleClientId.value) {
     toast.error('Please configure your Google Client ID first');
@@ -80,18 +82,257 @@ const loginWithGoogle = () => {
     return;
   }
   
-  // Implicit OAuth 2.0 flow
   const clientId = googleClientId.value;
   const redirectUri = window.location.origin + '/login';
   const scope = 'email profile';
   const state = 'oauth-state-system';
+
+  // If using default client ID, use interactive Google Account Chooser popup
+  if (clientId === defaultClientId) {
+    const width = 500;
+    const height = 600;
+    const left = (window.screen.width - width) / 2;
+    const top = (window.screen.height - height) / 2;
+    
+    const popup = window.open('', 'GoogleSignIn', `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`);
+    
+    if (!popup) {
+      toast.error('Popup blocked by browser! Please allow popups for this site.');
+      return;
+    }
+
+    popup.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Sign in - Google Accounts</title>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+          <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+          <style>
+            body {
+              background-color: #f0f4f9;
+              font-family: 'Roboto', Arial, sans-serif;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              min-height: 100vh;
+              margin: 0;
+            }
+            .card {
+              background: #ffffff;
+              border: 1px solid #dadce0;
+              border-radius: 8px;
+              width: 100%;
+              max-width: 450px;
+              padding: 40px;
+              box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            }
+            .google-logo {
+              display: block;
+              margin: 0 auto 20px auto;
+            }
+            .title {
+              font-size: 24px;
+              font-weight: 400;
+              color: #202124;
+              margin-bottom: 8px;
+            }
+            .subtitle {
+              font-size: 16px;
+              color: #5f6368;
+              margin-bottom: 24px;
+            }
+            .account-row {
+              display: flex;
+              align-items: center;
+              padding: 12px 16px;
+              border-bottom: 1px solid #dadce0;
+              cursor: pointer;
+              transition: background-color 0.2s;
+              border-radius: 4px;
+            }
+            .account-row:hover {
+              background-color: #f1f3f4;
+            }
+            .avatar {
+              width: 36px;
+              height: 36px;
+              border-radius: 50%;
+              margin-right: 12px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: white;
+              font-weight: 500;
+              font-size: 16px;
+              background-color: #1a73e8;
+              background-size: cover;
+              background-position: center;
+            }
+            .form-control:focus {
+              border-color: #1a73e8;
+              box-shadow: 0 0 0 3px rgba(26,115,232,0.2);
+            }
+            .btn-primary {
+              background-color: #1a73e8;
+              border: none;
+              padding: 10px 24px;
+              font-weight: 500;
+            }
+            .btn-primary:hover {
+              background-color: #1557b0;
+            }
+            .btn-secondary {
+              background-color: transparent;
+              color: #1a73e8;
+              border: none;
+              font-weight: 500;
+            }
+            .btn-secondary:hover {
+              background-color: rgba(26,115,232,0.04);
+              color: #1557b0;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="card">
+            <div class="text-center">
+              <svg class="google-logo" width="74" height="24" viewBox="0 0 74 24">
+                <path fill="#4285F4" d="M6 19.3c-3.1 0-5.7-2.5-5.7-5.7s2.5-5.7 5.7-5.7c1.5 0 2.9.6 3.9 1.6l2.1-2.1C10.4 5.9 8.3 5 6 5 2.1 5 0 8.1 0 13.6s2.1 8.6 6 8.6c3 0 5-1.7 5.6-4.1H6v-3.2h8.7c.1.5.2.9.2 1.5 0 5.4-3.5 7.9-8.9 7.9z"/>
+                <path fill="#EA4335" d="M22.5 21.6c-2.8 0-4.9-2.2-4.9-4.9s2.1-4.9 4.9-4.9c2.8 0 4.9 2.2 4.9 4.9s-2.1 4.9-4.9 4.9zm0-2.8c1.3 0 2.1-1.1 2.1-2.1s-.8-2.1-2.1-2.1-2.1 1.1-2.1 2.1.8 2.1 2.1 2.1z"/>
+                <path fill="#FBBC05" d="M34.5 21.6c-2.8 0-4.9-2.2-4.9-4.9s2.1-4.9 4.9-4.9c2.8 0 4.9 2.2 4.9 4.9s-2.1 4.9-4.9 4.9zm0-2.8c1.3 0 2.1-1.1 2.1-2.1s-.8-2.1-2.1-2.1-2.1 1.1-2.1 2.1.8 2.1 2.1 2.1z"/>
+                <path fill="#4285F4" d="M46.5 21.6c-2.6 0-4.4-1.9-4.4-4.7V12h3v4.6c0 1.2.7 1.8 1.6 1.8s1.6-.6 1.6-1.8V12h3v9.3h-3v-1.1c-.5.9-1.5 1.4-2.8 1.4z"/>
+                <path fill="#34A853" d="M54.5 21.6c-1.5 0-2.8-.7-3.4-1.8l2.6-1.1c.4.6.8.8 1.2.8.5 0 .9-.3.9-.7V12h3.1v6.8c0 2.8-2 2.8-4.4 2.8z"/>
+                <path fill="#EA4335" d="M64.5 21.6c-2.7 0-4.5-1.9-4.5-4.7V12h3v4.6c0 1.2.7 1.8 1.5 1.8.8 0 1.5-.6 1.5-1.8V12h3v9.3h-3v-1.1c-.5.9-1.5 1.4-2.8 1.4z"/>
+              </svg>
+              
+              <div id="chooser-section">
+                <h1 class="title">Choose an account</h1>
+                <p class="subtitle">to continue to Student Management</p>
+                
+                <div class="account-list text-start mb-4">
+                  <div class="account-row" onclick="selectAccount('seavmoeurng1122@gmail.com', 'Seav Moeurng', 'https://t3.ftcdn.net/jpg/16/06/80/78/360_F_1606807867_RlJNJoHBniGLT1a88UuAIfkEnALRwUoW.jpg')">
+                    <div class="avatar" style="background-image: url('https://t3.ftcdn.net/jpg/16/06/80/78/360_F_1606807867_RlJNJoHBniGLT1a88UuAIfkEnALRwUoW.jpg')"></div>
+                    <div>
+                      <div class="fw-semibold text-dark mb-0" style="font-size: 0.95rem;">Seav Moeurng</div>
+                      <div class="text-muted small">seavmoeurng1122@gmail.com</div>
+                    </div>
+                  </div>
+                  
+                  <div class="account-row" onclick="selectAccount('student.tester@gmail.com', 'Student Tester', '')">
+                    <div class="avatar">T</div>
+                    <div>
+                      <div class="fw-semibold text-dark mb-0" style="font-size: 0.95rem;">Student Tester</div>
+                      <div class="text-muted small">student.tester@gmail.com</div>
+                    </div>
+                  </div>
+                  
+                  <div class="account-row" onclick="showCustomInput()">
+                    <div class="avatar bg-light text-secondary border"><i class="bi bi-person-plus-fill"></i></div>
+                    <div>
+                      <div class="fw-semibold text-primary mb-0" style="font-size: 0.95rem;">Use another account</div>
+                      <div class="text-muted small">Sign in with a different Gmail</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div id="custom-section" class="d-none text-start">
+                <h1 class="title text-center">Sign in with Google</h1>
+                <p class="subtitle text-center">Use your Google Account</p>
+                
+                <form onsubmit="handleCustomSubmit(event)" class="mt-4">
+                  <div class="mb-4">
+                    <label class="form-label text-muted small">Email (Gmail address)</label>
+                    <input type="email" id="custom-email" required class="form-control py-2.5" placeholder="name@gmail.com" />
+                  </div>
+                  
+                  <div class="mb-4">
+                    <label class="form-label text-muted small">Password</label>
+                    <input type="password" required class="form-control py-2.5" placeholder="••••••••" />
+                  </div>
+
+                  <div class="d-flex justify-content-between align-items-center mt-5">
+                    <button type="button" onclick="showChooser()" class="btn btn-secondary px-0">Back</button>
+                    <button type="submit" class="btn btn-primary px-4">Next</button>
+                  </div>
+                </form>
+              </div>
+
+              <p class="text-muted mt-5" style="font-size: 12px; line-height: 1.4;">
+                To continue, Google will share your name, email address, language preference, and profile picture with Student Management.
+              </p>
+            </div>
+          </div>
+
+          <script>
+            function selectAccount(email, name, picture) {
+              window.opener.postMessage({
+                type: 'GOOGLE_SIGNIN_SUCCESS',
+                email: email,
+                name: name,
+                picture: picture
+              }, window.location.origin);
+              window.close();
+            }
+
+            function showCustomInput() {
+              document.getElementById('chooser-section').classList.add('d-none');
+              document.getElementById('custom-section').classList.remove('d-none');
+            }
+
+            function showChooser() {
+              document.getElementById('custom-section').classList.add('d-none');
+              document.getElementById('chooser-section').classList.remove('d-none');
+            }
+
+            function handleCustomSubmit(e) {
+              e.preventDefault();
+              const email = document.getElementById('custom-email').value;
+              
+              let name = email.split('@')[0];
+              name = name.charAt(0).toUpperCase() + name.slice(1);
+              
+              selectAccount(email, name, '');
+            }
+          \x3C/script\x3E
+        </body>
+      </html>
+    `);
+    popup.document.close();
+    return;
+  }
   
+  // Real OAuth 2.0 flow fallback
   const googleUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=token&client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}&state=${state}`;
-  
   window.location.href = googleUrl;
 };
 
+const handleMessage = (event) => {
+  if (event.origin !== window.location.origin) return;
+  
+  if (event.data && event.data.type === 'GOOGLE_SIGNIN_SUCCESS') {
+    const { email, name, picture } = event.data;
+    
+    localStorage.setItem('token', 'google-oauth-access-token-simulated');
+    localStorage.setItem('google_user_email', email);
+    localStorage.setItem('google_user_name', name);
+    if (picture) {
+      localStorage.setItem('google_user_picture', picture);
+    } else {
+      localStorage.removeItem('google_user_picture');
+    }
+    
+    toast.success(`Google Sign-In successful! Welcome, ${name}`);
+    router.push('/');
+  }
+};
+
 onMounted(() => {
+  window.addEventListener('message', handleMessage);
+
   // Check for access token redirect from Google OAuth
   const hash = window.location.hash;
   if (hash) {
@@ -104,7 +345,6 @@ onMounted(() => {
         .then(response => {
           const { email, name, picture } = response.data;
           
-          // Login admin successfully with google session
           localStorage.setItem('token', 'google-oauth-access-token-' + accessToken);
           localStorage.setItem('google_user_email', email);
           localStorage.setItem('google_user_name', name);
@@ -121,11 +361,14 @@ onMounted(() => {
         })
         .finally(() => {
           loading.value = false;
-          // Clear hash fragment from address bar
           window.history.replaceState({}, document.title, window.location.pathname);
         });
     }
   }
+});
+
+onUnmounted(() => {
+  window.removeEventListener('message', handleMessage);
 });
 </script>
 

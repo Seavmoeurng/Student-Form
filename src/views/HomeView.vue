@@ -32,11 +32,12 @@
                   
                   <div class="d-flex align-items-center gap-4 mb-4">
                     <div class="profile-avatar-container">
-                      <img src="@/assets/logo.jpg" alt="Logo" class="avatar-neon" />
+                      <img :src="adminPicture || defaultAvatar" alt="Logo" class="avatar-neon" />
                       <div class="avatar-glow"></div>
                     </div>
                     <div class="flex-grow-1">
-                      <h4 class="text-white fw-bold mb-1">DATABASE ADMIN</h4>
+                      <h4 class="text-white fw-bold mb-1">{{ adminName }}</h4>
+                      <p class="text-white-50 small mb-1">{{ adminEmail }}</p>
                       <p class="text-neon-pink small mb-3">Level: {{ adminLevel }} (Superuser)</p>
                       
                       <!-- Level / XP Progress Bar -->
@@ -389,6 +390,11 @@ import axios from 'axios';
 const students = ref([]);
 const loading = ref(true);
 
+const adminName = ref('DATABASE ADMIN');
+const adminEmail = ref('admin@system.com');
+const adminPicture = ref('');
+const defaultAvatar = 'https://t3.ftcdn.net/jpg/16/06/80/78/360_F_1606807867_RlJNJoHBniGLT1a88UuAIfkEnALRwUoW.jpg';
+
 const stats = ref({
   total: 0,
   active: 0,
@@ -524,6 +530,14 @@ const fetchDashboardData = async () => {
 
 onMounted(() => {
   fetchDashboardData();
+  
+  const name = localStorage.getItem('google_user_name');
+  const email = localStorage.getItem('google_user_email');
+  const picture = localStorage.getItem('google_user_picture');
+  
+  if (name) adminName.value = name.toUpperCase();
+  if (email) adminEmail.value = email;
+  if (picture) adminPicture.value = picture;
 });
 </script>
 
