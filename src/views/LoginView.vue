@@ -39,11 +39,38 @@ const handleLogin = async () => {
 const showSettings = ref(false);
 const googleClientId = ref(localStorage.getItem('google_client_id') || '364372938834-tq0r7c0jtrc4csqe88chpvd5q1cgr64m.apps.googleusercontent.com');
 const currentOrigin = ref(window.location.origin + '/login');
+const windowOrigin = ref(window.location.origin);
 
 const saveGoogleSettings = () => {
   localStorage.setItem('google_client_id', googleClientId.value);
   toast.success('Google Client ID configuration saved!');
   showSettings.value = false;
+};
+
+const copyToClipboard = (text) => {
+  navigator.clipboard.writeText(text)
+    .then(() => {
+      toast.success('Copied to clipboard!');
+    })
+    .catch(err => {
+      console.error('Failed to copy:', err);
+      toast.error('Failed to copy to clipboard');
+    });
+};
+
+const simulateGoogleLogin = () => {
+  loading.value = true;
+  setTimeout(() => {
+    // Log the user in with simulated Google credentials
+    localStorage.setItem('token', 'google-oauth-access-token-simulated');
+    localStorage.setItem('google_user_email', 'seavmoeurng1122@gmail.com');
+    localStorage.setItem('google_user_name', 'Seav Moeurng (Simulated)');
+    localStorage.setItem('google_user_picture', 'https://t3.ftcdn.net/jpg/16/06/80/78/360_F_1606807867_RlJNJoHBniGLT1a88UuAIfkEnALRwUoW.jpg');
+    
+    toast.success('Simulated Google Sign-In successful! Welcome, Seav Moeurng');
+    loading.value = false;
+    router.push('/');
+  }, 800);
 };
 
 const loginWithGoogle = () => {
@@ -165,12 +192,22 @@ onMounted(() => {
           <button 
             @click="loginWithGoogle" 
             type="button" 
-            class="btn google-cyber-btn w-100 py-2.5 d-flex align-items-center justify-content-center gap-2 mb-4"
+            class="btn google-cyber-btn w-100 py-2.5 d-flex align-items-center justify-content-center gap-2 mb-3"
           >
             <svg class="google-icon" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
               <path fill="#d946ef" d="M12.24 10.285V14.4h6.887c-.648 2.41-2.519 4.114-5.136 4.114-3.478 0-6.3-2.822-6.3-6.3s2.822-6.3 6.3-6.3c1.706 0 3.199.687 4.29 1.794l3.14-3.14C19.347 2.226 16.035 1 12.24 1 6.033 1 1 6.033 1 12.24s5.033 11.24 11.24 11.24c5.898 0 10.871-4.212 10.871-11.24 0-.648-.073-1.32-.2-1.955H12.24z"/>
             </svg>
-            <span class="text-white fw-bold" style="font-size: 0.9rem;">Sign in with Google</span>
+            <span class="text-white fw-bold" style="font-size: 0.9rem;">Sign in with Google (OAuth)</span>
+          </button>
+
+          <!-- Simulate Google Login (Bypass / Local Testing) -->
+          <button 
+            @click="simulateGoogleLogin" 
+            type="button" 
+            class="btn simulate-cyber-btn w-100 py-2.5 d-flex align-items-center justify-content-center gap-2 mb-4"
+          >
+            <i class="bi bi-lightning-charge-fill text-neon-pink"></i>
+            <span class="text-white fw-bold" style="font-size: 0.9rem;">Simulate Google Login (Bypass)</span>
           </button>
 
           <!-- Config button and settings panel -->
@@ -181,23 +218,54 @@ onMounted(() => {
               class="btn btn-link text-white-50 text-decoration-none small hover-neon"
               style="font-size: 0.8rem;"
             >
-              <i class="bi bi-gear-fill me-1"></i> Configure Google Client ID
+              <i class="bi bi-gear-fill me-1"></i> Developer Google OAuth Settings
             </button>
             
             <div v-if="showSettings" class="mt-2 p-3 text-start rounded border border-purple-20 bg-dark-purple-90">
-              <label class="form-label text-white-50 small mb-1">Google Client ID</label>
-              <input 
-                type="text" 
-                v-model="googleClientId" 
-                class="form-control form-control-sm bg-transparent text-white border-purple-30 focus-purple mb-2" 
-                placeholder="xxxx-xxxx.apps.googleusercontent.com"
-              />
-              <button type="button" @click="saveGoogleSettings" class="btn btn-sm btn-neon-purple w-100 py-1.5 fw-bold">
-                Save Config
-              </button>
-              <p class="text-white-50 fs-8 mt-2 mb-0">
-                Note: Whitelist redirect <code>{{ currentOrigin }}</code> in Google Cloud Console.
-              </p>
+              <h6 class="text-white fw-bold small mb-2 text-uppercase font-monospace text-neon-purple">OAuth Configuration</h6>
+              
+              <div class="mb-3">
+                <label class="form-label text-white-50 small mb-1">Google Client ID</label>
+                <input 
+                  type="text" 
+                  v-model="googleClientId" 
+                  class="form-control form-control-sm bg-transparent text-white border-purple-30 focus-purple mb-2" 
+                  placeholder="xxxx-xxxx.apps.googleusercontent.com"
+                />
+                <button type="button" @click="saveGoogleSettings" class="btn btn-sm btn-neon-purple w-100 py-1.5 fw-bold">
+                  Save Config
+                </button>
+              </div>
+
+              <!-- Diagnostic Info & Steps to solve 401 client error -->
+              <div class="border-top border-purple-20 pt-2 mt-2">
+                <p class="text-neon-pink fw-bold small mb-1">
+                  <i class="bi bi-info-circle-fill"></i> How to solve Error 401: invalid_client?
+                </p>
+                <p class="text-white-50 fs-8 mb-2">
+                  Google requires creating credentials in your Google Cloud Console for this origin:
+                </p>
+                
+                <div class="mb-2">
+                  <span class="text-white-50 fs-8 d-block mb-1">1. Authorized JavaScript Origin:</span>
+                  <div class="input-group input-group-sm">
+                    <input type="text" readonly :value="windowOrigin" class="form-control bg-transparent text-white-50 border-purple-20 fs-8 py-0" />
+                    <button type="button" @click="copyToClipboard(windowOrigin)" class="btn btn-outline-purple btn-xs" style="padding: 1px 6px; border: 1px solid rgba(168, 85, 247, 0.4);"><i class="bi bi-clipboard text-white-50"></i></button>
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <span class="text-white-50 fs-8 d-block mb-1">2. Authorized Redirect URI:</span>
+                  <div class="input-group input-group-sm">
+                    <input type="text" readonly :value="currentOrigin" class="form-control bg-transparent text-white-50 border-purple-20 fs-8 py-0" />
+                    <button type="button" @click="copyToClipboard(currentOrigin)" class="btn btn-outline-purple btn-xs" style="padding: 1px 6px; border: 1px solid rgba(168, 85, 247, 0.4);"><i class="bi bi-clipboard text-white-50"></i></button>
+                  </div>
+                </div>
+
+                <p class="text-white-50 fs-8 mb-0" style="line-height: 1.2;">
+                  Create OAuth credentials on <a href="https://console.cloud.google.com" target="_blank" class="text-neon-purple text-decoration-underline font-monospace">Google Cloud Console</a> as a "Web application", add the URIs above, then paste the client ID here.
+                </p>
+              </div>
             </div>
           </div>
 
@@ -348,5 +416,49 @@ onMounted(() => {
 
 .fs-8 {
   font-size: 0.72rem;
+}
+
+.simulate-cyber-btn {
+  background: rgba(244, 63, 94, 0.04);
+  border: 1px solid rgba(244, 63, 94, 0.35);
+  color: #ffffff;
+  border-radius: 30px;
+  transition: all 0.3s;
+}
+
+.simulate-cyber-btn:hover {
+  background: rgba(244, 63, 94, 0.12);
+  border-color: #f43f5e;
+  transform: translateY(-1px);
+  box-shadow: 0 0 15px rgba(244, 63, 94, 0.3) !important;
+}
+
+.btn-outline-purple {
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  color: #a855f7;
+  background: transparent;
+  transition: all 0.2s;
+}
+
+.btn-outline-purple:hover {
+  background: rgba(168, 85, 247, 0.15);
+  color: #d946ef;
+  border-color: #d946ef;
+}
+
+.btn-xs {
+  padding: 0.15rem 0.4rem;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  border-radius: 0.2rem;
+}
+
+.text-neon-purple {
+  color: #d946ef;
+  text-shadow: 0 0 8px rgba(217, 70, 239, 0.3);
+}
+
+.letter-spacing-1 {
+  letter-spacing: 1px;
 }
 </style>
