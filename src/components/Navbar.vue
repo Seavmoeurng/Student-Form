@@ -24,7 +24,7 @@ const handleLogout = () => {
         <div class="nav-card shadow-sm d-flex justify-content-between align-items-center w-100">
           <router-link class="navbar-brand d-flex align-items-center" to="/">
             <img src="@/assets/logo.jpg" alt="Logo" class="navbar-logo" />
-            <span class="text-primary fw-bold ms-2">Student App</span>
+            <span class="text-white fw-bold ms-2">Student Management</span>
           </router-link>
 
           <div class="navbar-nav flex-row gap-2 gap-md-4">
@@ -73,8 +73,8 @@ const handleLogout = () => {
 }
 
 .navbar-wrapper {
-  background: linear-gradient(90deg, #0d6efd 0%, #003399 100%);
-  padding: 30px 0;
+  background: transparent;
+  padding: 24px 0 0 0;
   margin-bottom: 20px;
 }
 
@@ -83,16 +83,18 @@ const handleLogout = () => {
 }
 
 .nav-card {
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   padding: 10px 30px;
-  border-radius: 12px;
+  border-radius: 16px;
   min-height: 60px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08) !important;
-  border: 1px solid rgba(0, 0, 0, 0.02);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .custom-link {
-  color: #4a5568 !important;
+  color: rgba(255, 255, 255, 0.85) !important;
   font-weight: 500;
   padding: 8px 12px !important;
   position: relative;
@@ -105,12 +107,12 @@ const handleLogout = () => {
 }
 
 .custom-link:hover {
-  color: #0d6efd !important;
+  color: #ffffff !important;
 }
 
 /* Active link indicator */
 .custom-link.active {
-  color: #0d6efd !important;
+  color: #ffffff !important;
 }
 
 .custom-link.active::after {
@@ -120,7 +122,7 @@ const handleLogout = () => {
   left: 12px;
   right: 12px;
   height: 3px;
-  background-color: #0d6efd;
+  background-color: #ffffff;
   border-radius: 3px 3px 0 0;
 }
 

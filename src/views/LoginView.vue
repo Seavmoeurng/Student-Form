@@ -121,7 +121,7 @@ const loginWithGoogle = () => {
               <path fill="#EA4335" d="M64.5 21.6c-2.7 0-4.5-1.9-4.5-4.7V12h3v4.6c0 1.2.7 1.8 1.5 1.8.8 0 1.5-.6 1.5-1.8V12h3v9.3h-3v-1.1c-.5.9-1.5 1.4-2.8 1.4z"/>
             </svg>
             <h4 class="fw-bold mb-1 mt-3">Choose an account</h4>
-            <p class="text-muted small">to continue to Student App</p>
+            <p class="text-muted small">to continue to Student Management</p>
           </div>
           
           <div class="account-row" onclick="selectAccount('seavmoeurng1122@gmail.com', 'Seavmoeurng')">
@@ -140,7 +140,7 @@ const loginWithGoogle = () => {
           </div>
           
           <div class="text-center mt-4">
-            <p class="text-muted small mb-0">To continue, Google will share your name, email address, and profile picture with Student App.</p>
+            <p class="text-muted small mb-0">To continue, Google will share your name, email address, and profile picture with Student Management.</p>
           </div>
         </div>
         
@@ -180,249 +180,173 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="mobile-login-page d-flex align-items-center justify-content-center min-vh-100 py-5">
+  <div class="purple-login-page d-flex align-items-center justify-content-center min-vh-100 py-5">
     
-    <!-- Mobile Frame Screen Card -->
-    <div class="mobile-frame shadow-lg position-relative overflow-hidden">
-      
-      <!-- Top Organic Wave Section -->
-      <div class="top-wave-container">
-        <svg viewBox="0 0 500 240" preserveAspectRatio="none" class="top-wave-svg">
-          <path d="M0,0 L500,0 L500,150 C380,210 260,80 0,180 Z" fill="url(#wave-grad)"></path>
-          <defs>
-            <linearGradient id="wave-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#00d2ff" />
-              <stop offset="100%" stop-color="#0066ff" />
-            </linearGradient>
-          </defs>
-        </svg>
-        <div class="wave-text text-start px-4">
-          <h1 class="fw-bold text-white mb-0 fs-2 leading-tight">Hello,</h1>
-          <h1 class="fw-bold text-white fs-2 leading-tight">Sign in!</h1>
+    <!-- Glassmorphic Login Card -->
+    <div class="card glass-login-card shadow-lg border-0">
+      <div class="card-body p-4 p-md-5">
+        
+        <!-- RULE Logo and Title -->
+        <div class="text-center mb-5">
+          <img src="@/assets/logo.jpg" alt="RULE Logo" class="rule-logo mb-3 shadow" />
+          <h1 class="text-white fw-bold fs-3">Login</h1>
         </div>
-      </div>
 
-      <!-- Login Form Content -->
-      <div class="login-form-container px-4">
         <form @submit.prevent="handleLogin">
           
           <!-- Underline Email Input -->
-          <div class="input-line-group mb-4">
+          <div class="mb-4">
+            <label class="form-label text-white fw-semibold mb-1">Email</label>
             <input 
               type="email" 
               v-model="credentials.email" 
               required 
-              class="input-line" 
-              placeholder="Enter your Email" 
+              class="input-underline-white" 
               id="email-input" 
             />
           </div>
 
           <!-- Underline Password Input -->
-          <div class="input-line-group mb-4">
+          <div class="mb-4">
+            <label class="form-label text-white fw-semibold mb-1">Password</label>
             <input 
               type="password" 
               v-model="credentials.password" 
               required 
-              class="input-line" 
-              placeholder="Password" 
+              class="input-underline-white" 
               id="password-input" 
             />
           </div>
 
-          <!-- Action Buttons / Links -->
-          <div class="d-flex align-items-center justify-content-between mt-5">
-            <button 
-              type="submit" 
-              class="btn sign-in-pill-btn shadow-sm"
-              :disabled="loading"
-            >
-              <span v-if="loading" class="spinner-border spinner-border-sm me-1"></span>
-              Sign in
-            </button>
-            <a href="#" class="text-muted small text-decoration-none fw-medium">Forgot Password</a>
+          <!-- Action Links (Remember Me & Forgot Password) -->
+          <div class="d-flex align-items-center justify-content-between mb-5">
+            <div class="form-check m-0">
+              <input type="checkbox" class="form-check-input" id="remember-me" />
+              <label class="form-check-label text-white small" for="remember-me">Remember Me</label>
+            </div>
+            <a href="#" class="text-white small fw-bold text-decoration-none">Forgot Password</a>
           </div>
-        </form>
 
-        <!-- Social login divider -->
-        <div class="d-flex align-items-center my-4">
-          <hr class="flex-grow-1 text-muted opacity-25 m-0">
-          <span class="px-3 text-muted small" style="font-size: 0.75rem;">Or Sign In With</span>
-          <hr class="flex-grow-1 text-muted opacity-25 m-0">
-        </div>
-
-        <!-- Google button styled to match pill design -->
-        <div class="text-center">
+          <!-- Solid White Log in Button -->
+          <button 
+            type="submit" 
+            class="btn login-solid-btn w-100 py-2.5 fw-semibold shadow-sm mb-4"
+            :disabled="loading"
+          >
+            <span v-if="loading" class="spinner-border spinner-border-sm me-1"></span>
+            Log in
+          </button>
+          
+          <!-- Google Login (Styled to match purple glassmorphic theme) -->
           <button 
             @click="loginWithGoogle" 
             type="button" 
-            class="btn google-pill-btn w-100 py-2 d-flex align-items-center justify-content-center gap-2"
+            class="btn google-glass-btn w-100 py-2.5 d-flex align-items-center justify-content-center gap-2 mb-4"
           >
             <svg class="google-icon" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
-              <path fill="#EA4335" d="M12 5.04c1.67 0 3.2.58 4.38 1.69l3.27-3.27C17.67 1.54 15.01 1 12 1 7.24 1 3.2 3.73 1.25 7.72l3.88 3C6.07 7.75 8.78 5.04 12 5.04z"/>
-              <path fill="#4285F4" d="M23.49 12.27c0-.81-.07-1.59-.2-2.34H12v4.51h6.46c-.29 1.48-1.14 2.73-2.4 3.58l3.73 2.89c2.18-2 3.7-4.96 3.7-8.64z"/>
-              <path fill="#FBBC05" d="M5.13 14.72c-.24-.72-.38-1.49-.38-2.29s.14-1.57.38-2.29L1.25 7.14C.45 8.74 0 10.53 0 12.43s.45 3.69 1.25 5.29l3.88-3z"/>
-              <path fill="#34A853" d="M12 23c3.24 0 5.97-1.07 7.96-2.91l-3.73-2.89c-1.1.74-2.5 1.18-4.23 1.18-3.22 0-5.93-2.71-6.87-5.68l-3.88 3C3.2 20.27 7.24 23 12 23z"/>
+              <path fill="#ffffff" d="M12.24 10.285V14.4h6.887c-.648 2.41-2.519 4.114-5.136 4.114-3.478 0-6.3-2.822-6.3-6.3s2.822-6.3 6.3-6.3c1.706 0 3.199.687 4.29 1.794l3.14-3.14C19.347 2.226 16.035 1 12.24 1 6.033 1 1 6.033 1 12.24s5.033 11.24 11.24 11.24c5.898 0 10.871-4.212 10.871-11.24 0-.648-.073-1.32-.2-1.955H12.24z"/>
             </svg>
-            <span class="text-dark fw-medium" style="font-size: 0.85rem;">Google</span>
+            <span class="text-white fw-semibold" style="font-size: 0.9rem;">Sign in with Google</span>
           </button>
-        </div>
+
+          <!-- Register Link -->
+          <div class="text-center mt-3">
+            <span class="text-white opacity-75 small">Don't have a account</span>
+            <router-link to="/add-student" class="text-white fw-bold ms-2 text-decoration-none hover-underline small">Register</router-link>
+          </div>
+
+        </form>
 
       </div>
-
-      <!-- Bottom Organic Wave Section -->
-      <div class="bottom-wave-container">
-        <svg viewBox="0 0 500 150" preserveAspectRatio="none" class="bottom-wave-svg">
-          <path d="M0,80 C180,30 320,130 500,40 L500,150 L0,150 Z" fill="url(#bottom-grad)"></path>
-          <defs>
-            <linearGradient id="bottom-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#00d2ff" />
-              <stop offset="100%" stop-color="#0056ff" />
-            </linearGradient>
-          </defs>
-        </svg>
-        <div class="bottom-text px-4">
-          <span class="text-white small opacity-75">Don't have account?</span>
-          <router-link to="/add-student" class="text-white fw-bold ms-2 text-decoration-none hover-underline">Sign up</router-link>
-        </div>
-      </div>
-
     </div>
-
   </div>
 </template>
 
 <style scoped>
-.mobile-login-page {
-  background: linear-gradient(135deg, #001f54 0%, #0044cc 50%, #0099ff 100%);
+.purple-login-page {
+  background-image: url('@/assets/purple_night_forest.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   width: 100%;
 }
 
-/* Mobile Screen Frame simulation */
-.mobile-frame {
+.glass-login-card {
   width: 100%;
-  max-width: 400px;
-  height: 720px;
-  background-color: #dbe1f1;
-  border-radius: 40px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  display: flex;
-  flex-direction: column;
+  max-width: 460px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 28px;
 }
 
-/* Top Wave Container */
-.top-wave-container {
-  position: relative;
-  width: 100%;
-  height: 230px;
+.rule-logo {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid rgba(255, 255, 255, 0.4);
 }
 
-.top-wave-svg {
-  width: 100%;
-  height: 100%;
-}
-
-.wave-text {
-  position: absolute;
-  top: 60px;
-  left: 10px;
-  z-index: 2;
-}
-
-/* Form Underline Inputs styling */
-.login-form-container {
-  margin-top: 20px;
-  flex-grow: 1;
-}
-
-.input-line-group {
-  position: relative;
-}
-
-.input-line {
+.input-underline-white {
   width: 100%;
   border: none;
-  border-bottom: 1.5px solid #a0a8bf;
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.5);
   background: transparent;
-  padding: 10px 0;
-  color: #333333;
+  padding: 8px 0;
+  color: #ffffff;
   font-size: 1rem;
   transition: border-color 0.3s;
   outline: none;
 }
 
-.input-line::placeholder {
-  color: #a0a8bf;
+.input-underline-white:focus {
+  border-bottom-color: #ffffff;
 }
 
-.input-line:focus {
-  border-bottom-color: #0066ff;
+.form-check-input {
+  background-color: transparent;
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
-/* Pill buttons design */
-.sign-in-pill-btn {
-  background: linear-gradient(90deg, #00d2ff 0%, #0066ff 100%);
-  color: #ffffff;
+.form-check-input:checked {
+  background-color: #ffffff;
+  border-color: #ffffff;
+}
+
+.login-solid-btn {
+  background-color: #ffffff;
+  color: #511874; /* deep purple text */
   border: none;
   border-radius: 30px;
-  padding: 8px 36px !important;
-  font-size: 0.9rem;
-  font-weight: 600;
+  padding: 10px 24px !important;
+  font-size: 0.95rem;
+  font-weight: 700;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 10px rgba(0, 102, 255, 0.25) !important;
 }
 
-.sign-in-pill-btn:hover {
-  box-shadow: 0 6px 15px rgba(0, 102, 255, 0.35) !important;
+.login-solid-btn:hover {
+  background-color: rgba(255, 255, 255, 0.9);
   transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.25) !important;
+}
+
+.google-glass-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   color: #ffffff;
-}
-
-.google-pill-btn {
-  background-color: #ffffff;
-  border: 1px solid #c8cedf;
   border-radius: 30px;
-  transition: all 0.2s;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.03) !important;
+  transition: all 0.3s;
 }
 
-.google-pill-btn:hover {
-  background-color: #f3f5fa;
-  border-color: #b0b8d0;
+.google-glass-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.4);
   transform: translateY(-1px);
-}
-
-/* Bottom Wave Container */
-.bottom-wave-container {
-  position: relative;
-  width: 100%;
-  height: 120px;
-}
-
-.bottom-wave-svg {
-  width: 100%;
-  height: 100%;
-}
-
-.bottom-text {
-  position: absolute;
-  bottom: 24px;
-  right: 15px;
-  z-index: 2;
 }
 
 .hover-underline:hover {
   text-decoration: underline !important;
-}
-
-/* Responsive adjustments */
-@media (max-height: 750px) {
-  .mobile-frame {
-    height: 100%;
-    border-radius: 0;
-  }
-  .mobile-login-page {
-    padding: 0 !important;
-  }
 }
 </style>

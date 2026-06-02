@@ -1,34 +1,35 @@
 <template>
-  <div class="card shadow-sm border-0">
+  <div class="card glass-card shadow-lg border-0">
     <div class="card-body">
       <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
-        <h2 class="text-primary fw-bold mb-0">Student Management</h2>
+        <h2 class="text-white fw-bold mb-0">Student Management</h2>
         <div class="d-flex align-items-center gap-3 flex-wrap">
           <!-- Page Size Selector -->
           <div class="d-flex align-items-center gap-2">
-            <span class="text-muted small text-nowrap"><i class="bi bi-list-ol"></i> Show:</span>
+            <span class="text-white opacity-75 small text-nowrap"><i class="bi bi-list-ol"></i> Show:</span>
             <select v-model="itemsPerPage" @change="currentPage = 1" class="form-select form-select-sm" style="width: 80px; border-radius: 8px;">
-              <option :value="20">20</option>
-              <option :value="40">40</option>
-              <option :value="100">100</option>
+              <option :value="20" class="dropdown-option">20</option>
+              <option :value="40" class="dropdown-option">40</option>
+              <option :value="100" class="dropdown-option">100</option>
             </select>
           </div>
 
           <!-- Sort Option Dropdown -->
           <div class="d-flex align-items-center gap-2">
-            <span class="text-muted small text-nowrap"><i class="bi bi-sort-down"></i> Sort:</span>
+            <span class="text-white opacity-75 small text-nowrap"><i class="bi bi-sort-down"></i> Sort:</span>
             <select v-model="sortBy" class="form-select form-select-sm" style="width: 140px; border-radius: 8px;">
-              <option value="newest">Newest Added</option>
-              <option value="oldest">Oldest Added</option>
-              <option value="name-asc">Name (A-Z)</option>
-              <option value="name-desc">Name (Z-A)</option>
+              <option value="newest" class="dropdown-option">Newest Added</option>
+              <option value="oldest" class="dropdown-option">Oldest Added</option>
+              <option value="name-asc" class="dropdown-option">Name (A-Z)</option>
+              <option value="name-desc" class="dropdown-option">Name (Z-A)</option>
             </select>
           </div>
           
           <button
             @click="fetchStudents"
             :disabled="loading"
-            class="btn btn-primary btn-sm px-3"
+            class="btn btn-light btn-sm px-3 text-dark fw-bold border-0 shadow-sm"
+            style="border-radius: 8px;"
           >
             <span
               v-if="loading"
@@ -146,7 +147,7 @@
         </nav>
         
         <!-- Info text -->
-        <div class="text-muted small text-end flex-grow-1">
+        <div class="text-white opacity-75 small text-end flex-grow-1">
           Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to {{ Math.min(currentPage * itemsPerPage, sortedStudents.length) }} of {{ sortedStudents.length }} students
         </div>
       </div>
@@ -173,15 +174,17 @@ const url = "https://nodejsapi-wrcy.onrender.com/api/students";
 
 // 2. Sorted Students computed property (list new added student on top by default)
 const sortedStudents = computed(() => {
-  let list = [...students.value];
+  let list = Array.isArray(students.value)
+    ? students.value.filter(s => s && typeof s === 'object')
+    : [];
   if (sortBy.value === "newest") {
     list.sort((a, b) => {
-      if (a._id && b._id) return b._id.localeCompare(a._id);
+      if (a._id && b._id) return String(b._id).localeCompare(String(a._id));
       return 0;
     });
   } else if (sortBy.value === "oldest") {
     list.sort((a, b) => {
-      if (a._id && b._id) return a._id.localeCompare(b._id);
+      if (a._id && b._id) return String(a._id).localeCompare(String(b._id));
       return 0;
     });
   } else if (sortBy.value === "name-asc") {
@@ -299,7 +302,7 @@ defineExpose({
 
 <style scoped>
 .table-hover tbody tr:hover {
-  background-color: #f1f4f9;
+  background-color: rgba(255, 255, 255, 0.08) !important;
   transition: all 0.2s ease;
 }
 
@@ -308,9 +311,12 @@ defineExpose({
   padding: 0.5em 0.75em;
 }
 
-.card {
-  border-radius: 15px;
-  overflow: hidden;
+.glass-card {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
 }
 
 thead th {
@@ -318,5 +324,56 @@ thead th {
   text-transform: uppercase;
   font-size: 0.85rem;
   letter-spacing: 0.5px;
+  color: rgba(255, 255, 255, 0.9) !important;
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+/* Custom Dropdown select styling inside glass card */
+.form-select-sm {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+}
+
+.form-select-sm:focus {
+  background-color: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.4);
+  color: white;
+  box-shadow: none;
+}
+
+.dropdown-option {
+  background-color: #0b1a3a;
+  color: #ffffff;
+}
+
+/* Pagination button style override */
+.pagination :deep(.page-link) {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.pagination :deep(.page-item.active .page-link) {
+  background-color: #ffffff;
+  border-color: #ffffff;
+  color: #511874; /* deep purple text for active state */
+  font-weight: bold;
+}
+
+.pagination :deep(.page-item.disabled .page-link) {
+  background-color: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.table {
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+.table > :not(caption) > * > * {
+  border-bottom-color: rgba(255, 255, 255, 0.15);
 }
 </style>

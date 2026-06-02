@@ -12,5 +12,18 @@ import Navbar from './components/Navbar.vue'
 </template>
 
 <style>
+body {
+  margin: 0;
+  padding: 0;
+  background-image: url('@/assets/purple_night_forest.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+}
 
+#app {
+  min-height: 100vh;
+}
 </style>

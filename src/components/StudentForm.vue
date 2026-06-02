@@ -297,19 +297,20 @@ const addStudent = async () => {
 
 /* Sign up Pill-shaped Button in Mockup */
 .sign-up-pill-btn {
-  background: linear-gradient(90deg, #00d2ff 0%, #0072ff 100%);
-  color: #ffffff;
+  background-color: #ffffff;
+  color: #511874; /* deep purple text */
   border: none;
   border-radius: 30px;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 0.95rem;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 210, 255, 0.3) !important;
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2) !important;
 }
 
 .sign-up-pill-btn:hover {
-  box-shadow: 0 6px 18px rgba(0, 210, 255, 0.45) !important;
+  background-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 6px 18px rgba(255, 255, 255, 0.35) !important;
   transform: translateY(-1px);
-  color: #ffffff;
+  color: #511874;
 }
 </style>
