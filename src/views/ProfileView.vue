@@ -13,8 +13,8 @@
             <p class="text-white-50 small mt-1">Admin Profile Credentials</p>
           </div>
 
-          <!-- User Info Summary -->
-          <div class="d-flex flex-column align-items-center text-center mb-5">
+          <!-- User Info Summary (Read-Only Mode) -->
+          <div v-if="!isEditing" class="d-flex flex-column align-items-center text-center mb-5">
             <div class="profile-avatar-container mb-3">
               <img :src="userPicture || defaultAvatar" alt="User Profile" class="avatar-neon shadow-lg" />
               <div class="avatar-glow"></div>
@@ -22,6 +22,44 @@
             <h3 class="text-white fw-bold mb-1">{{ userName }}</h3>
             <span class="badge rank-badge px-3 py-1.5 mb-2">RANK S • SUPERUSER</span>
             <p class="text-white-50 font-monospace small mb-0">{{ userEmail }}</p>
+          </div>
+
+          <!-- User Info Edit Form (Edit Mode) -->
+          <div v-else class="mb-5">
+            <h5 class="section-title text-neon-purple small fw-bold mb-4 text-uppercase font-monospace">Modify Identity Details</h5>
+            
+            <div class="mb-4">
+              <label class="form-label text-white-50 small mb-1">SYSTEM CODENAME</label>
+              <input 
+                type="text" 
+                v-model="editForm.name" 
+                class="form-control form-control-sm bg-transparent text-white border-purple-30 focus-purple py-2 px-3" 
+                placeholder="Enter system codename"
+                required
+              />
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label text-white-50 small mb-1">AVATAR TRANSMISSION LINK (URL)</label>
+              <input 
+                type="text" 
+                v-model="editForm.picture" 
+                class="form-control form-control-sm bg-transparent text-white border-purple-30 focus-purple py-2.5 px-3 mb-3" 
+                placeholder="https://example.com/avatar.jpg"
+              />
+              <span class="text-white-50 fs-8 d-block mb-2 font-monospace">OR CHOOSE DB SYSTEM PRESETS:</span>
+              <div class="d-flex gap-3 justify-content-center flex-wrap">
+                <img 
+                  v-for="(img, idx) in avatarPresets" 
+                  :key="idx" 
+                  :src="img" 
+                  @click="editForm.picture = img" 
+                  class="preset-avatar-thumbnail" 
+                  :class="{ active: editForm.picture === img }" 
+                  alt="Preset Avatar" 
+                />
+              </div>
+            </div>
           </div>
 
           <!-- Console Detail Metrics -->
@@ -49,13 +87,26 @@
             </div>
           </div>
 
-          <!-- Action buttons -->
-          <div class="d-flex gap-3">
+          <!-- Action buttons (Read Mode) -->
+          <div v-if="!isEditing" class="d-flex flex-wrap gap-2 justify-content-center">
             <router-link to="/" class="btn btn-outline-cyber flex-grow-1 py-2 fw-bold text-decoration-none text-center">
-              RETURN TO DASHBOARD
+              DASHBOARD
             </router-link>
-            <button @click="handleLogout" class="btn btn-logout py-2 fw-bold flex-grow-1">
-              LOGOUT ACCESS
+            <button @click="startEditing" class="btn btn-edit-profile flex-grow-1 py-2 fw-bold">
+              EDIT PROFILE
+            </button>
+            <button @click="handleLogout" class="btn btn-logout flex-grow-1 py-2 fw-bold">
+              LOGOUT
+            </button>
+          </div>
+
+          <!-- Action buttons (Edit Mode) -->
+          <div v-else class="d-flex gap-3">
+            <button @click="cancelEditing" class="btn btn-outline-cyber flex-grow-1 py-2 fw-bold">
+              CANCEL
+            </button>
+            <button @click="saveProfile" class="btn btn-save-profile flex-grow-1 py-2 fw-bold">
+              SAVE CHANGES
             </button>
           </div>
 
@@ -78,6 +129,52 @@ const userName = ref('System Admin');
 const userEmail = ref('admin@system.com');
 const userPicture = ref('');
 const defaultAvatar = 'https://t3.ftcdn.net/jpg/16/06/80/78/360_F_1606807867_RlJNJoHBniGLT1a88UuAIfkEnALRwUoW.jpg';
+
+// Preset Avatars from StudentList image library
+const avatarPresets = [
+  "https://t3.ftcdn.net/jpg/16/06/80/78/360_F_1606807867_RlJNJoHBniGLT1a88UuAIfkEnALRwUoW.jpg",
+  "https://img.freepik.com/free-photo/front-view-lawyer-portrait_23-2151202433.jpg?semt=ais_hybrid&w=740&q=80",
+  "https://t4.ftcdn.net/jpg/07/89/65/59/360_F_789655932_ROzqiDLt4ea1sE3eks0LWyuYnkuZCata.jpg",
+  "https://img.freepik.com/free-photo/closeup-young-female-professional-making-eye-contact-against-colored-background_662251-651.jpg?semt=ais_hybrid&w=740&q=80",
+  "https://thumbs.dreamstime.com/b/profile-picture-caucasian-male-employee-posing-office-happy-young-worker-look-camera-workplace-headshot-portrait-smiling-190186649.jpg",
+];
+
+const isEditing = ref(false);
+const editForm = ref({
+  name: '',
+  picture: ''
+});
+
+const startEditing = () => {
+  editForm.value.name = userName.value;
+  editForm.value.picture = userPicture.value || defaultAvatar;
+  isEditing.value = true;
+};
+
+const cancelEditing = () => {
+  isEditing.value = false;
+};
+
+const saveProfile = () => {
+  if (!editForm.value.name.trim()) {
+    toast.error('System codename cannot be empty');
+    return;
+  }
+  
+  userName.value = editForm.value.name.trim();
+  userPicture.value = editForm.value.picture.trim();
+  
+  localStorage.setItem('google_user_name', userName.value);
+  if (userPicture.value && userPicture.value !== defaultAvatar) {
+    localStorage.setItem('google_user_picture', userPicture.value);
+  } else {
+    localStorage.removeItem('google_user_picture');
+    userPicture.value = '';
+  }
+  
+  toast.success('System credentials saved successfully!');
+  isEditing.value = false;
+};
 
 const handleLogout = () => {
   if (confirm('Are you sure you want to log out of the system?')) {
@@ -184,6 +281,10 @@ onMounted(() => {
   border-color: rgba(168, 85, 247, 0.25) !important;
 }
 
+.border-purple-30 {
+  border: 1px solid rgba(168, 85, 247, 0.35) !important;
+}
+
 .border-purple-10 {
   border-color: rgba(168, 85, 247, 0.15) !important;
 }
@@ -213,6 +314,36 @@ onMounted(() => {
   color: #ffffff;
 }
 
+.btn-edit-profile {
+  background: rgba(168, 85, 247, 0.15);
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  color: #ffffff;
+  border-radius: 20px;
+  transition: all 0.3s;
+}
+
+.btn-edit-profile:hover {
+  background: rgba(168, 85, 247, 0.3);
+  border-color: #d946ef;
+  text-shadow: 0 0 8px rgba(217, 70, 239, 0.5);
+  transform: translateY(-1px);
+}
+
+.btn-save-profile {
+  background: linear-gradient(135deg, #a855f7 0%, #d946ef 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 20px;
+  transition: all 0.3s;
+  box-shadow: 0 0 15px rgba(168, 85, 247, 0.3);
+}
+
+.btn-save-profile:hover {
+  background: linear-gradient(135deg, #b866ff 0%, #e956ff 100%);
+  box-shadow: 0 0 25px rgba(217, 70, 239, 0.5);
+  transform: translateY(-1px);
+}
+
 .btn-logout {
   background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
   color: #ffffff;
@@ -226,5 +357,36 @@ onMounted(() => {
   background: linear-gradient(135deg, #ff4d6d 0%, #f43f5e 100%);
   box-shadow: 0 0 25px rgba(244, 63, 94, 0.5);
   transform: translateY(-1px);
+}
+
+.preset-avatar-thumbnail {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.preset-avatar-thumbnail:hover {
+  border-color: #a855f7;
+  transform: scale(1.1);
+}
+
+.preset-avatar-thumbnail.active {
+  border-color: #d946ef;
+  box-shadow: 0 0 10px rgba(217, 70, 239, 0.6);
+  transform: scale(1.1);
+}
+
+.focus-purple:focus {
+  border-color: #d946ef !important;
+  box-shadow: 0 0 8px rgba(217, 70, 239, 0.3) !important;
+  outline: none;
+}
+
+.fs-8 {
+  font-size: 0.72rem;
 }
 </style>
