@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
@@ -35,147 +35,70 @@ const handleLogin = async () => {
     }
 };
 
+// Real Google Sign-in Configurations
+const showSettings = ref(false);
+const googleClientId = ref(localStorage.getItem('google_client_id') || '364372938834-tq0r7c0jtrc4csqe88chpvd5q1cgr64m.apps.googleusercontent.com');
+const currentOrigin = ref(window.location.origin + '/login');
+
+const saveGoogleSettings = () => {
+  localStorage.setItem('google_client_id', googleClientId.value);
+  toast.success('Google Client ID configuration saved!');
+  showSettings.value = false;
+};
+
 const loginWithGoogle = () => {
-  // Open simulated Google login popup
-  const width = 500;
-  const height = 600;
-  const left = (window.screen.width - width) / 2;
-  const top = (window.screen.height - height) / 2;
-  
-  const popup = window.open(
-    '',
-    'GoogleSignIn',
-    `width=${width},height=${height},left=${left},top=${top},status=no,location=no,toolbar=no,menubar=no`
-  );
-  
-  if (!popup) {
-    toast.error('Popup blocked. Please allow popups for this site.');
+  if (!googleClientId.value) {
+    toast.error('Please configure your Google Client ID first');
+    showSettings.value = true;
     return;
   }
   
-  popup.document.write(`
-    <html>
-      <head>
-        <title>Sign in - Google Accounts</title>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-        <style>
-          body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f0f4f9;
-            height: 100vh;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          }
-          .card {
-            width: 450px;
-            padding: 40px;
-            border-radius: 28px;
-            background: #fff;
-            border: 1px solid #e0e0e0;
-          }
-          .google-logo {
-            width: 74px;
-            height: 24px;
-            margin-bottom: 16px;
-          }
-          .account-row {
-            padding: 16px;
-            border-bottom: 1px solid #f0f0f0;
-            cursor: pointer;
-            transition: background 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border-radius: 12px;
-            margin-bottom: 8px;
-          }
-          .account-row:hover {
-            background-color: #f8f9fa;
-          }
-          .avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background-color: #0d6efd;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 1.1rem;
-          }
-        </style>
-      </head>
-      <body>
-        <div class="card shadow-sm">
-          <div class="text-center mb-4">
-            <svg class="google-logo" viewBox="0 0 74 24" width="74" height="24">
-              <path fill="#4285F4" d="M6 19.3c-3.1 0-5.7-2.5-5.7-5.7s2.5-5.7 5.7-5.7c1.5 0 2.9.6 3.9 1.6l2.1-2.1C10.4 5.9 8.3 5 6 5 2.1 5 0 8.1 0 13.6s2.1 8.6 6 8.6c3 0 5-1.7 5.6-4.1H6v-3.2h8.7c.1.5.2.9.2 1.5 0 5.4-3.5 7.9-8.9 7.9z"/>
-              <path fill="#EA4335" d="M22.5 21.6c-2.8 0-4.9-2.2-4.9-4.9s2.1-4.9 4.9-4.9c2.8 0 4.9 2.2 4.9 4.9s-2.1 4.9-4.9 4.9zm0-2.8c1.3 0 2.1-1.1 2.1-2.1s-.8-2.1-2.1-2.1-2.1 1.1-2.1 2.1.8 2.1 2.1 2.1z"/>
-              <path fill="#FBBC05" d="M34.5 21.6c-2.8 0-4.9-2.2-4.9-4.9s2.1-4.9 4.9-4.9c2.8 0 4.9 2.2 4.9 4.9s-2.1 4.9-4.9 4.9zm0-2.8c1.3 0 2.1-1.1 2.1-2.1s-.8-2.1-2.1-2.1-2.1 1.1-2.1 2.1.8 2.1 2.1 2.1z"/>
-              <path fill="#4285F4" d="M46.5 21.6c-2.6 0-4.4-1.9-4.4-4.7V12h3v4.6c0 1.2.7 1.8 1.6 1.8s1.6-.6 1.6-1.8V12h3v9.3h-3v-1.1c-.5.9-1.5 1.4-2.8 1.4z"/>
-              <path fill="#34A853" d="M54.5 21.6c-1.5 0-2.8-.7-3.4-1.8l2.6-1.1c.4.6.8.8 1.2.8.5 0 .9-.3.9-.7V12h3.1v6.8c0 2.8-2 2.8-4.4 2.8z"/>
-              <path fill="#EA4335" d="M64.5 21.6c-2.7 0-4.5-1.9-4.5-4.7V12h3v4.6c0 1.2.7 1.8 1.5 1.8.8 0 1.5-.6 1.5-1.8V12h3v9.3h-3v-1.1c-.5.9-1.5 1.4-2.8 1.4z"/>
-            </svg>
-            <h4 class="fw-bold mb-1 mt-3">Choose an account</h4>
-            <p class="text-muted small">to continue to Student Management</p>
-          </div>
-          
-          <div class="account-row" onclick="selectAccount('seavmoeurng1122@gmail.com', 'Seavmoeurng')">
-            <div class="avatar bg-primary">S</div>
-            <div>
-              <div class="fw-bold text-dark mb-0" style="font-size: 0.9rem;">Seavmoeurng</div>
-              <div class="text-muted small">seavmoeurng1122@gmail.com</div>
-            </div>
-          </div>
-          <div class="account-row" onclick="selectAccount('student.tester@gmail.com', 'Student Tester')">
-            <div class="avatar bg-success">T</div>
-            <div>
-              <div class="fw-bold text-dark mb-0" style="font-size: 0.9rem;">Student Tester</div>
-              <div class="text-muted small">student.tester@gmail.com</div>
-            </div>
-          </div>
-          
-          <div class="text-center mt-4">
-            <p class="text-muted small mb-0">To continue, Google will share your name, email address, and profile picture with Student Management.</p>
-          </div>
-        </div>
-        
-        \x3Cscript\x3E
-          function selectAccount(email, name) {
-            window.opener.postMessage({
-              type: 'GOOGLE_SIGNIN_SUCCESS',
-              email: email,
-              name: name,
-              token: 'mock-google-token-xyz-123'
-            }, window.location.origin);
-            window.close();
-          }
-        \x3C/script\x3E
-      </body>
-    </html>
-  `);
-};
-
-const handleMessage = (event) => {
-  if (event.origin !== window.location.origin) return;
+  // Implicit OAuth 2.0 flow
+  const clientId = googleClientId.value;
+  const redirectUri = window.location.origin + '/login';
+  const scope = 'email profile';
+  const state = 'oauth-state-system';
   
-  if (event.data && event.data.type === 'GOOGLE_SIGNIN_SUCCESS') {
-    localStorage.setItem('token', event.data.token);
-    toast.success(`Google Sign-In successful! Welcome, ${event.data.name}`);
-    router.push('/');
-  }
+  const googleUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=token&client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}&state=${state}`;
+  
+  window.location.href = googleUrl;
 };
 
 onMounted(() => {
-  window.addEventListener('message', handleMessage);
-});
-
-onUnmounted(() => {
-  window.removeEventListener('message', handleMessage);
+  // Check for access token redirect from Google OAuth
+  const hash = window.location.hash;
+  if (hash) {
+    const params = new URLSearchParams(hash.substring(1));
+    const accessToken = params.get('access_token');
+    
+    if (accessToken) {
+      loading.value = true;
+      axios.get(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${accessToken}`)
+        .then(response => {
+          const { email, name, picture } = response.data;
+          
+          // Login admin successfully with google session
+          localStorage.setItem('token', 'google-oauth-access-token-' + accessToken);
+          localStorage.setItem('google_user_email', email);
+          localStorage.setItem('google_user_name', name);
+          if (picture) {
+            localStorage.setItem('google_user_picture', picture);
+          }
+          
+          toast.success(`Google Sign-In successful! Welcome, ${name}`);
+          router.push('/');
+        })
+        .catch(error => {
+          console.error('Google Auth Fetch Error:', error);
+          toast.error('Failed to authenticate with Google. Verify your Client ID credentials and authorized origins.');
+        })
+        .finally(() => {
+          loading.value = false;
+          // Clear hash fragment from address bar
+          window.history.replaceState({}, document.title, window.location.pathname);
+        });
+    }
+  }
 });
 </script>
 
@@ -249,6 +172,34 @@ onUnmounted(() => {
             </svg>
             <span class="text-white fw-bold" style="font-size: 0.9rem;">Sign in with Google</span>
           </button>
+
+          <!-- Config button and settings panel -->
+          <div class="text-center mt-2 mb-4">
+            <button 
+              type="button" 
+              @click="showSettings = !showSettings" 
+              class="btn btn-link text-white-50 text-decoration-none small hover-neon"
+              style="font-size: 0.8rem;"
+            >
+              <i class="bi bi-gear-fill me-1"></i> Configure Google Client ID
+            </button>
+            
+            <div v-if="showSettings" class="mt-2 p-3 text-start rounded border border-purple-20 bg-dark-purple-90">
+              <label class="form-label text-white-50 small mb-1">Google Client ID</label>
+              <input 
+                type="text" 
+                v-model="googleClientId" 
+                class="form-control form-control-sm bg-transparent text-white border-purple-30 focus-purple mb-2" 
+                placeholder="xxxx-xxxx.apps.googleusercontent.com"
+              />
+              <button type="button" @click="saveGoogleSettings" class="btn btn-sm btn-neon-purple w-100 py-1.5 fw-bold">
+                Save Config
+              </button>
+              <p class="text-white-50 fs-8 mt-2 mb-0">
+                Note: Whitelist redirect <code>{{ currentOrigin }}</code> in Google Cloud Console.
+              </p>
+            </div>
+          </div>
 
           <!-- Register Link -->
           <div class="text-center mt-3">
@@ -362,5 +313,40 @@ onUnmounted(() => {
 .hover-neon:hover {
   color: #d946ef !important;
   text-shadow: 0 0 8px rgba(217, 70, 239, 0.5);
+}
+
+.border-purple-20 {
+  border-color: rgba(168, 85, 247, 0.25) !important;
+}
+
+.border-purple-30 {
+  border: 1px solid rgba(168, 85, 247, 0.35) !important;
+}
+
+.bg-dark-purple-90 {
+  background: rgba(10, 8, 20, 0.95) !important;
+}
+
+.focus-purple:focus {
+  border-color: #d946ef !important;
+  box-shadow: 0 0 8px rgba(217, 70, 239, 0.3) !important;
+  outline: none;
+}
+
+.btn-neon-purple {
+  background: linear-gradient(135deg, #a855f7 0%, #d946ef 100%);
+  color: #ffffff;
+  border: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 8px rgba(168, 85, 247, 0.2);
+}
+
+.btn-neon-purple:hover {
+  background: linear-gradient(135deg, #b866ff 0%, #e956ff 100%);
+  box-shadow: 0 0 15px rgba(217, 70, 239, 0.4);
+}
+
+.fs-8 {
+  font-size: 0.72rem;
 }
 </style>

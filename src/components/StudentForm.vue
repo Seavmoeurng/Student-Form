@@ -21,30 +21,15 @@ const student = ref({
 const toast = useToast();
 
 const addStudent = async () => {
-  if (student.value.password !== student.value.confirmPassword) {
-    toast.error('Passwords do not match');
-    return;
-  }
-
-  if (student.value.gender !== 'Male' && student.value.gender !== 'Female') {
-    toast.error('Gender must be either Male or Female');
-    return;
-  }
-
-  if (student.value.studentStatus !== 'Single' && student.value.studentStatus !== 'Married') {
-    toast.error('Status must be either Single or Married');
-    return;
-  }
-
-  if (student.value.score < 0 || student.value.score > 100) {
-    toast.error('Score must be between 0 and 100');
-    return;
-  }
-
-  if (student.value.DateOfBirth > new Date().toISOString().split('T')[0]) {
-    toast.error('Date of Birth cannot be in the future');
-    return;
-  }
+  // Populate required backend fields with default values
+  student.value.confirmPassword = student.value.password;
+  student.value.firstName = 'User';
+  student.value.lastName = student.value.email.split('@')[0] || 'Member';
+  student.value.gender = 'Male';
+  student.value.studentStatus = 'Single';
+  student.value.active = 'true';
+  student.value.score = 100;
+  student.value.DateOfBirth = '2000-01-01';
 
   try {
     const url = 'https://nodejsapi-wrcy.onrender.com/api/auth/register';
@@ -100,121 +85,15 @@ const addStudent = async () => {
         />
       </div>
 
-      <!-- First Name / Last Name (Side by Side) -->
-      <div class="row g-3">
-        <div class="col-6 mb-4">
-          <div class="input-line-group">
-            <label class="form-label-cyber">FIRST NAME</label>
-            <input 
-              type="text" 
-              v-model="student.firstName" 
-              required 
-              class="input-line-cyber" 
-              placeholder="First Name" 
-            />
-          </div>
-        </div>
-        <div class="col-6 mb-4">
-          <div class="input-line-group">
-            <label class="form-label-cyber">LAST NAME</label>
-            <input 
-              type="text" 
-              v-model="student.lastName" 
-              required 
-              class="input-line-cyber" 
-              placeholder="Last Name" 
-            />
-          </div>
-        </div>
-      </div>
-
-      <!-- Password / Confirm Password (Side by side) -->
-      <div class="row g-3">
-        <div class="col-6 mb-4">
-          <div class="input-line-group">
-            <label class="form-label-cyber">SECURITY PASSWORD</label>
-            <input 
-              type="password" 
-              v-model="student.password" 
-              required 
-              class="input-line-cyber" 
-              placeholder="Password" 
-            />
-          </div>
-        </div>
-        <div class="col-6 mb-4">
-          <div class="input-line-group">
-            <label class="form-label-cyber">CONFIRM PASSWORD</label>
-            <input 
-              type="password" 
-              v-model="student.confirmPassword" 
-              required 
-              class="input-line-cyber" 
-              placeholder="Confirm Password" 
-            />
-          </div>
-        </div>
-      </div>
-
-      <!-- Gender / Status (Side by Side select) -->
-      <div class="row g-3">
-        <div class="col-6 mb-4">
-          <div class="input-line-group">
-            <label class="form-label-cyber">IDENTITY GENDER</label>
-            <select v-model="student.gender" class="select-line-cyber" required>
-              <option value="" disabled selected>Select Gender</option>
-              <option value="Male" class="dropdown-option">Male</option>
-              <option value="Female" class="dropdown-option">Female</option>
-            </select>
-          </div>
-        </div>
-        <div class="col-6 mb-4">
-          <div class="input-line-group">
-            <label class="form-label-cyber">CIVIL STATUS</label>
-            <select v-model="student.studentStatus" class="select-line-cyber" required>
-              <option value="" disabled selected>Select Status</option>
-              <option value="Single" class="dropdown-option">Single</option>
-              <option value="Married" class="dropdown-option">Married</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <!-- Active / Score (Side by Side) -->
-      <div class="row g-3">
-        <div class="col-6 mb-4">
-          <div class="input-line-group">
-            <label class="form-label-cyber">SYSTEM STATUS</label>
-            <select v-model="student.active" class="select-line-cyber" required>
-              <option value="true" class="dropdown-option">True (Active)</option>
-              <option value="false" class="dropdown-option">False (Inactive)</option>
-            </select>
-          </div>
-        </div>
-        <div class="col-6 mb-4">
-          <div class="input-line-group">
-            <label class="form-label-cyber">ACADEMIC SCORE (0-100)</label>
-            <input 
-              type="number" 
-              v-model="student.score" 
-              required 
-              class="input-line-cyber" 
-              min="0" 
-              max="100" 
-              placeholder="Score (0-100)" 
-            />
-          </div>
-        </div>
-      </div>
-
-      <!-- Date of Birth -->
+      <!-- Password (White Underline) -->
       <div class="input-line-group mb-5">
-        <label class="form-label-cyber">DATE OF BIRTH</label>
+        <label class="form-label-cyber">SECURITY PASSWORD</label>
         <input 
-          type="date" 
-          v-model="student.DateOfBirth" 
+          type="password" 
+          v-model="student.password" 
           required 
-          class="input-line-cyber date-input-cyber" 
+          class="input-line-cyber" 
+          placeholder="Enter security password" 
         />
       </div>
 

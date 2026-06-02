@@ -84,6 +84,9 @@ const handleLogout = () => {
 }
 
 .navbar-wrapper {
+  position: sticky;
+  top: 0;
+  z-index: 1030;
   background: transparent;
   padding: 20px 24px 0 24px;
   margin-bottom: 10px;
